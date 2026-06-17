@@ -1,0 +1,38 @@
+hotel-booking-analytics-platform/
+│
+├── .gitignore
+├── README.md                      # Tài liệu tổng quan dự án, kiến trúc hệ thống
+├── requirements.txt               # Các thư viện Python cần dùng (FastAPI, Airflow, dbt-bigquery,...)
+│
+├── backend/                       # Nơi chứa code vận hành (EPIC 2 & 3)
+│   ├── app/
+│   │   ├── main.py                # File khởi chạy FastAPI API
+│   │   ├── database.py            # Cấu hình kết nối PostgreSQL
+│   │   ├── models.py              # Schema cơ sở dữ liệu 3NF
+│   │   └── utils/
+│   │       ├── cache.py           # O(1) Product Cache Engine
+│   │       └── monitor.py         # collections.deque Anomaly Detection Engine
+│   └── scripts/
+│       └── data_generator.py      # Script Python Faker sinh 100k dữ liệu mẫu
+│
+├── airflow/                       # Nơi chứa luồng Ingestion (EPIC 4)
+│   ├── dags/
+│   │   └── hotel_booking_ingestion.py  # DAG trích xuất Postgres -> GCS -> BigQuery
+│   └── plugins/
+│
+├── dbt_project/                   # Nơi chứa tầng biến đổi dữ liệu (EPIC 5)
+│   ├── dbt_project.yml
+│   ├── models/
+│   │   ├── staging/               # Tầng dữ liệu thô từ BigQuery
+│   │   │   ├── schema.yml         # Khai báo cấu hình kiểm thử cơ bản (not null, unique...)
+│   │   │   ├── stg_reservations.sql
+│   │   │   └── stg_customers.sql
+│   │   └── marts/                 # Tầng phân tích Star Schema (Fact/Dim)
+│   │       ├── fact_bookings.sql  # Tính doanh thu, KPI, chuyển đổi thời gian
+│   │       └── dim_customers.sql  # Phân hạng khách hàng (VIP, Loyal, Standard)
+│   └── tests/                     # Tầng kiểm thử logic nghiệp vụ tùy chỉnh (.sql)
+│       ├── assert_check_out_after_check_in.sql
+│       └── assert_payment_amount_is_positive.sql
+│
+└── templates_or_dashboards/       # Nơi lưu file Tableau (.twbx) hoặc ảnh chụp Dashboard
+    └── dashboards_preview/
